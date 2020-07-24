@@ -16,7 +16,7 @@ commands:
         default: RANCHER_CONTEXT
         description: |
           Name of environment variable storing the Rancher2 context you want to use
-        type: env_var_name
+        type: string
     steps:
       - orb-tools/check-env-var-param:
           command-name: Checking whether required env vars are set to initialize Rancher2 CLI...
@@ -76,7 +76,7 @@ examples:
     description: Install the Rancher2 CLI, if not available
     usage:
       orbs:
-        rancher2_cli: brandnewbox/rancher2_cli@1.0.1
+        rancher2_cli: brandnewbox/rancher2_cli@1.0.2
       version: 2.1
       workflows:
         install_and_configure_cli:
