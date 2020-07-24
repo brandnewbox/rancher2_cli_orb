@@ -1,0 +1,154 @@
+commands:
+  initialize:
+    description: Initilize the Rancher2 CLI
+    parameters:
+      rancher-token:
+        default: RANCHER_TOKEN
+        description: |
+          Name of environment variable storing the Rancher2 API bearer token
+        type: env_var_name
+      rancher-server-url:
+        default: RANCHER_SERVER_URL
+        description: |
+          Name of environment variable storing the Rancher2 url
+        type: env_var_name
+      rancher-context:
+        default: RANCHER_CONTEXT
+        description: |
+          Name of environment variable storing the Rancher2 context you want to use
+        type: env_var_name
+    steps:
+      - orb-tools/check-env-var-param:
+          command-name: Checking whether required env vars are set to initialize Rancher2 CLI...
+          param: <<parameters.rancher-token>>,<<parameters.rancher-server-url>>,<<parameters.rancher-context>>
+      - run:
+          command: |
+            rancher login  $<<parameters.rancher-server-url>> --token $<<parameters.rancher-token>> --context $<<parameters.rancher-context>>
+          name: Initialize Rancher2 CLI
+  install:
+    description: Install the Rancher2 CLI, if not available
+    steps:
+      - run:
+          command: |
+            install () {
+              # Set sudo to work whether logged in as root user or non-root user
+              if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+              $SUDO rm -rf /var/lib/apt/lists/*
+
+              if [[ $(command -v curl) == "" ]]; then
+                $SUDO apt-get update && \
+                  $SUDO apt-get -y install curl
+              fi
+
+              if [[ $(command -v jq) == "" ]]; then
+                $SUDO apt-get update && \
+                  $SUDO apt-get -y install jq
+              fi
+
+              # Get latest download link
+              export LATEST_DOWNLOAD_LINK=$(curl --silent \
+                "https://api.github.com/repos/rancher/cli/releases/latest" | \
+                  jq -r '.assets[] | select(.name|test("rancher-linux-amd64-.*.tar.gz")).browser_download_url')
+
+              # Downlaod latest package
+              curl -sL $LATEST_DOWNLOAD_LINK | tar -xzv -C /tmp
+
+              # Install
+              cd /tmp/rancher*
+              $SUDO mv rancher /usr/local/bin
+              $SUDO chmod +x /usr/local/bin/rancher
+            }
+
+            if [[ $(command -v rancher) == "" ]]; then
+              install
+            else
+              echo "rancher is already installed."
+            fi
+
+            echo "Success! Rancher2 CLI has been installed; displaying version information:"
+            rancher -v
+          name: Install latest Rancher2 CLI version, if not available
+description: |
+  Install and configure the Rancher2 CLI
+examples:
+  simple_install_and_configure:
+    description: Install the Rancher2 CLI, if not available
+    usage:
+      orbs:
+        rancher2_cli: brandnewbox/rancher2_cli@1.0.0
+      version: 2.1
+      workflows:
+        install_and_configure_cli:
+          jobs:
+            - rancher2_cli/install_and_initialize_cli:
+                rancher-token: token-j9gtk
+                rancher-server-url: https://rancher.domain.com
+                rancher-context: c-ABCDE:p-12345
+executors:
+  default:
+    description: |
+      A debian based docker container to use when running the doctl
+    docker:
+      - image: circleci/golang:<<parameters.golang-version>>-<<parameters.debian-release>>
+    parameters:
+      debian-release:
+        default: stretch
+        description: |
+          Which Debian release?
+        enum:
+          - stretch
+          - jessie
+        type: enum
+      golang-version:
+        default: "1.11"
+        description: |
+          What version of golang? For full options, see https://hub.docker.com/r/circleci/golang/tags
+        type: string
+  machine:
+    description: |
+      CircleCI's machine executor: https://circleci.com/docs/2.0/executor-types/#using-machine
+    machine:
+      image: circleci/classic:<<parameters.machine-image>>
+    parameters:
+      machine-image:
+        default: latest
+        description: |
+          What version of CircleCI's machine executor? For details, see https://circleci.com/docs/2.0/configuration-reference/#machine
+        type: string
+jobs:
+  install_and_initialize_cli:
+    description: |
+      Install Rancher2 CLI and initialize to connect to Rancher
+    executor: <<parameters.executor>>
+    parameters:
+      executor:
+        default: default
+        description: |
+          Executor to use for this job. Defaults to this orb's default executor.
+        type: executor
+      rancher-token:
+        default: RANCHER_TOKEN
+        description: |
+          Name of environment variable storing the Rancher2 API bearer token
+        type: env_var_name
+      rancher-server-url:
+        default: RANCHER_SERVER_URL
+        description: |
+          Name of environment variable storing the Rancher2 url
+        type: env_var_name
+      rancher-context:
+        default: RANCHER_CONTEXT
+        description: |
+          Name of environment variable storing the Rancher2 context you want to use
+        type: env_var_name
+    steps:
+      - install
+      - initialize:
+          rancher-token: <<parameters.rancher-token>>
+          rancher-server-url: <<parameters.rancher-server-url>>
+          rancher-context: <<parameters.rancher-context>>
+
+orbs:
+  orb-tools: circleci/orb-tools@8.26.0
+version: 2.1
