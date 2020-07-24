@@ -76,7 +76,7 @@ examples:
     description: Install the Rancher2 CLI, if not available
     usage:
       orbs:
-        rancher2_cli: brandnewbox/rancher2_cli@1.0.0
+        rancher2_cli: brandnewbox/rancher2_cli@1.0.1
       version: 2.1
       workflows:
         install_and_configure_cli:
