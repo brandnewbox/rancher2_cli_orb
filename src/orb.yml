@@ -46,15 +46,20 @@ commands:
                   $SUDO apt-get -y install jq
               fi
 
-              # Get latest download link
+              # Install kubectl
+              curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+              $SUDO mv kubectl /usr/local/bin
+              $SUDO chmod +x /usr/local/bin/kubectl
+
+              # Get latest rancher download link
               export LATEST_DOWNLOAD_LINK=$(curl --silent \
                 "https://api.github.com/repos/rancher/cli/releases/latest" | \
                   jq -r '.assets[] | select(.name|test("rancher-linux-amd64-.*.tar.gz")).browser_download_url')
 
-              # Downlaod latest package
+              # Downlaod latest rancher package
               curl -sL $LATEST_DOWNLOAD_LINK | $SUDO tar -xzv -C /tmp
 
-              # Install
+              # Install rancher
               cd /tmp/rancher*
               $SUDO mv rancher /usr/local/bin
               $SUDO chmod +x /usr/local/bin/rancher
@@ -76,7 +81,7 @@ examples:
     description: Install the Rancher2 CLI, if not available
     usage:
       orbs:
-        rancher2_cli: brandnewbox/rancher2_cli@1.0.5
+        rancher2_cli: brandnewbox/rancher2_cli@1.0.6
       version: 2.1
       workflows:
         install_and_configure_cli:
