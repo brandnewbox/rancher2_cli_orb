@@ -23,7 +23,8 @@ commands:
           param: <<parameters.rancher-token>>,<<parameters.rancher-server-url>>,<<parameters.rancher-context>>
       - run:
           command: |
-            rancher login  $<<parameters.rancher-server-url>> --token $<<parameters.rancher-token>> --context <<parameters.rancher-context>>
+            if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+            $SUDO rancher login  $<<parameters.rancher-server-url>> --token $<<parameters.rancher-token>> --context <<parameters.rancher-context>>
           name: Initialize Rancher2 CLI
   install:
     description: Install the Rancher2 CLI, if not available
@@ -81,7 +82,7 @@ examples:
     description: Install the Rancher2 CLI, if not available
     usage:
       orbs:
-        rancher2_cli: brandnewbox/rancher2_cli@1.0.6
+        rancher2_cli: brandnewbox/rancher2_cli@1.0.7
       version: 2.1
       workflows:
         install_and_configure_cli:
