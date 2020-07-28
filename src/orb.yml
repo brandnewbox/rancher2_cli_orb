@@ -64,6 +64,10 @@ commands:
               cd /tmp/rancher*
               $SUDO mv rancher /usr/local/bin
               $SUDO chmod +x /usr/local/bin/rancher
+
+              # In order for rancher to run as the default user
+              # we need to ensure the /tmp directory can be written to.
+              $SUDO chmod 1777 /tmp
             }
 
             if [[ $(command -v rancher) == "" ]]; then
@@ -82,7 +86,7 @@ examples:
     description: Install the Rancher2 CLI, if not available
     usage:
       orbs:
-        rancher2_cli: brandnewbox/rancher2_cli@1.0.8
+        rancher2_cli: brandnewbox/rancher2_cli@1.0.9
       version: 2.1
       workflows:
         install_and_configure_cli:
