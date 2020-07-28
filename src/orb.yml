@@ -1,3 +1,8 @@
+version: 2.1
+
+orbs:
+  orb-tools: circleci/orb-tools@8.26.0
+
 commands:
   initialize:
     description: Initilize the Rancher2 CLI
@@ -47,11 +52,6 @@ commands:
                   $SUDO apt-get -y install jq
               fi
 
-              # Install kubectl
-              curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-              $SUDO mv kubectl /usr/local/bin
-              $SUDO chmod +x /usr/local/bin/kubectl
-
               # Get latest rancher download link
               export LATEST_DOWNLOAD_LINK=$(curl --silent \
                 "https://api.github.com/repos/rancher/cli/releases/latest" | \
@@ -82,7 +82,7 @@ examples:
     description: Install the Rancher2 CLI, if not available
     usage:
       orbs:
-        rancher2_cli: brandnewbox/rancher2_cli@1.0.7
+        rancher2_cli: brandnewbox/rancher2_cli@1.0.8
       version: 2.1
       workflows:
         install_and_configure_cli:
@@ -154,7 +154,3 @@ jobs:
           rancher-token: <<parameters.rancher-token>>
           rancher-server-url: <<parameters.rancher-server-url>>
           rancher-context: <<parameters.rancher-context>>
-
-orbs:
-  orb-tools: circleci/orb-tools@8.26.0
-version: 2.1
