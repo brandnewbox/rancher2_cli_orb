@@ -56,6 +56,14 @@ commands:
                 "https://api.github.com/repos/rancher/cli/releases/latest" | \
                   jq -r '.assets[] | select(.name|test("rancher-linux-amd64-.*.tar.gz")).browser_download_url')
 
+              if [ -z "$LATEST_DOWNLOAD_LINK" ]
+              then
+                echo "\$LATEST_DOWNLOAD_LINK was not set from GitHub. Using Hard-Coded Value"
+                export LATEST_DOWNLOAD_LINK="https://github.com/rancher/cli/releases/download/v2.6.5/rancher-linux-amd64-v2.6.5.tar.xz"
+              else
+                echo "\$LATEST_DOWNLOAD_LINK is was successfully set from GitHub"
+              fi
+
               # Downlaod latest rancher package
               curl -sL $LATEST_DOWNLOAD_LINK | $SUDO tar -xzv -C /tmp
 
