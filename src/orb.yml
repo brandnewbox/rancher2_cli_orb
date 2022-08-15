@@ -59,7 +59,7 @@ commands:
               if [ -z "$LATEST_DOWNLOAD_LINK" ]
               then
                 echo "\$LATEST_DOWNLOAD_LINK was not set from GitHub. Using Hard-Coded Value"
-                export LATEST_DOWNLOAD_LINK="https://github.com/rancher/cli/releases/download/v2.6.5/rancher-linux-amd64-v2.6.5.tar.xz"
+                export LATEST_DOWNLOAD_LINK="https://github.com/brandnewbox/rancher2_cli_orb/blob/master/rancher_cli.tar.xz?raw=true"
               else
                 echo "\$LATEST_DOWNLOAD_LINK is was successfully set from GitHub"
               fi

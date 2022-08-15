@@ -18,6 +18,8 @@ As of August 2022, it is using `rancher-darwin-amd64-v2.6.7-rc1.tar.gz`.
 
 If you intend to update the version, please make sure it unzips. Some did not.
 
+By keeping the file name generic, we can swap in new versions without having to change the underlying orb.
+
 # Updating?
 
 Don't forget to bump the version in `.circleci/config.yml` and in the example in `src/orb.yml` everytime!
